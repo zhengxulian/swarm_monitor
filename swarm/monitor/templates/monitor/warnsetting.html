@@ -1,0 +1,168 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BandMonitor</title>
+    <script src="{% static "jquery-3.3.1.min.js" %}"></script>
+    <script src="{% static "bootstrap-3.3.7/dist/js/bootstrap.js" %}"></script>
+    <script src="{% static "bootstrap-3.3.7/dist/js/echarts.min.js" %}"></script>
+    <link href="{% static "bootstrap-3.3.7/dist/css/bootstrap.css" %}" rel="stylesheet">
+    <link href="{% static "bootstrap-3.3.7/dist/css/bootstrap-theme.css" %}" rel="stylesheet">
+    <link href="{% static "bootstrap-3.3.7/dist/css/theme.css" %}" rel="stylesheet">
+    <link href="{% static "slide.css" %}" rel="stylesheet">
+</head>
+<body style="font-family: 微软雅黑;">
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/monitor/index/">Band Monitor</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class=""><a href="/monitor/index/">Home</a></li>
+            </ul>
+            <ul class="nav navbar-nav">
+                <li class=""><a href="#">Monitor</a></li>
+            </ul>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/monitor/warn/">WarnSetting</a></li>
+            </ul>
+            <ul class="nav navbar-nav pull-right">
+                <li><a class="btn" href="/monitor/index/"><i class="glyphicon glyphicon-share-alt" style="transform: rotateY(180deg); margin-right: 20px;"></i>返回</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+<div class="container theme-showcase" role="main">
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{ ModalLabel.type }}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <span id="hostID" hidden></span>
+                        <label for="txt_port">告警邮箱</label>
+                        <input type="text" name="txt_email" class="form-control" id="txt_email" placeholder="告警邮箱，请用英文逗号分隔">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                    <button type="button" onclick="editEmail()" id="btn_submit" class="btn btn-primary" data-dismiss="modal"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="warns">
+{#        <button onclick="showDialog()">click</button>#}
+        <div class="box-header with-border">
+            <h3 class="box-title">告警配置</h3>
+        </div><!-- /.box-header -->
+
+        <div>
+            <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th style="width: 8%">ID</th>
+                    <th style="width: 20%">节点名称</th>
+                    <th style="width: 20%">节点IP</th>
+                    <th style="width: 44%">告警邮箱</th>
+                    <th style="width: 8%">开启告警</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key,value in hosts.items %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value.name }}</td>
+                    <td><span class="label label-success">{{ value.ip }}</span></td>
+                    <td><span id="table_email_{{ key }}">{{ value.email }}</span><i class="pull-right glyphicon glyphicon-edit" onclick="showDialog({{ key }})"></i></td>
+                    <td>
+                        <div class="selected_remind_input" >
+                            <input id="checkbox_enable_{{ key }}" type="checkbox" onchange="changeEmailEnable({{ key }})" {% ifequal value.enable False %}{% else %}checked{% endifequal %}>
+                            <label for="checkbox_enable_{{ key }}" id="label_enable_{{ key }}">Check</label>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div><!-- /.table-responsive -->
+
+    </div>
+</div>
+</body>
+<script>
+    function showDialog(id){
+        $('#myModalLabel').text("编辑");
+        $('#hostID').text(id);
+        var elm = '#table_email_' + id;
+        $('#txt_email').val($(elm)[0].innerText);
+        $('#myModal').modal();
+    }
+
+    function changeEmailEnable(id) {
+        var elemID = "input#checkbox_enable_"+id;
+        var enable = "";
+        console.log($(elemID)[0].checked);
+        if($(elemID)[0].checked) {
+            enable = "true";
+        }else{
+            enable = "false";
+        }
+        $.ajax({
+            url: '/monitor/editEmailEnable/',
+            data: {
+                id: id,
+                enable: enable
+            },
+            method: 'GET',
+            success:function (ret) {
+                console.log(ret);
+                var result = JSON.parse(ret);
+                {#console.log(result);#}
+                {#id = json.result.id;#}
+                if(result.code == 0){
+                    console.log('enable修改成功！')
+                }
+            }
+        })
+    }
+
+    function editEmail() {
+        var id = $('#hostID').text();
+        console.log(id);
+        var emailTo = $('#txt_email').val();
+        console.log(emailTo);
+        $.ajax({
+            url: '/monitor/editEmailTo/',
+            data: {
+                id: id,
+                emailTo: emailTo
+            },
+            method: 'GET',
+            success:function (ret) {
+                console.log(ret);
+                var result = JSON.parse(ret);
+                {#console.log(result);#}
+                {#id = json.result.id;#}
+                if(result.code == 0){
+                    console.log('emailTo修改成功！');
+                    var emailTo = result.result;
+                    var elm = '#table_email_' + id;
+                    $(elm).text(emailTo);
+                }
+            }
+        })
+    }
+</script>
+</html>
