@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-import monitor.views
+import swarm.monitor.views
 
-urlpatterns = [
+urlpatterns = {
     path('admin/', admin.site.urls),
-    path('monitor/index', monitor.views.index)
-]
+    path('monitor/index', swarm.monitor.views.index),
+    path('monitor/add_nodes', swarm.monitor.views.add_nodes),
+}
