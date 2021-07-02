@@ -13,75 +13,142 @@
           integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
           integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+    {#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">#}
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
             integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
             crossorigin="anonymous"></script>
+    {#    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>#}
 </head>
 <body style="font-family: 微软雅黑;">
+
+<div class="modal fade" id="addNodeModal" tabindex="-1" role="dialog"
+     aria-labelledby="addNodeModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addNodeModalLabel">添加节点列表</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <textarea class="form-control" id="node-list-text" style="height: 300px;"
+                                  placeholder="请按照：ip,port,name 格式添加节点，多节点请换行添加"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="addNode()">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container" style="margin-top: 30px">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <span class="input-group col-md-offset-8" style="margin-top: 0; position: relative">
+    <div class="col-md-3">
+        <div class="panel panel-info" style="padding: 0">
+            <div class="panel-heading">
+                <h3 class="panel-title">节点总数</h3>
+            </div>
+            <div class="panel-body" id="node-sum">
+                {{ nodeSum }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-info" style="padding: 0">
+            <div class="panel-heading">
+                <h3 class="panel-title">离线节点数</h3>
+            </div>
+            <div class="panel-body" id="off-node-sum">
+                {{ offNodeSum }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-info" style="padding: 0">
+            <div class="panel-heading">
+                <h3 class="panel-title">支票总数</h3>
+            </div>
+            <div class="panel-body" id="cheque-sum">
+                {{ chequeSum }}
+            </div>
+        </div>
+    </div>
+<div class="col-md-3">
+        <div class="panel panel-info" style="padding: 0">
+            <div class="panel-heading">
+                <h3 class="panel-title">待兑换支票数</h3>
+            </div>
+            <div class="panel-body" id="uncashed-sum">
+                {{ uncashedSum }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+            <span class="input-group col-md-offset-7" style="margin-top: 0; position: relative">
                 <input type="text" class="form-control" placeholder="请输入IP"/>
                 <span class="input-group-btn">
                     <button class="btn btn-info btn-search">搜索</button>
-                    <input type="file" id="btn_file" style="display:none" accept=".txt">
-                    <button class="btn btn-info btn-add" style="margin-left: 5px" onclick="addNode()">添加</button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#addNodeModal" data-whatever="@mdo" style="margin-left: 5px">添加节点</button>
+                    <button class="btn btn-success" style="margin-left: 5px" onclick="refreshNodes()">刷新节点</button>
                 </span>
             </span>
-        </div>
-        <div class="panel-body">
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>序号</th>
-                    <th>IP</th>
-                    <th>端口</th>
-                    <th>别名</th>
-                    <th>状态</th>
-                    <th>连接数</th>
-                    <th>支票</th>
-                    <th>待提现</th>
-                    <th>操作</th>
-                    <th>区块链浏览器</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                </tr>
-                </tbody>
-            </table>
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    <li>
-                        <a href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="active"><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                    <li>
-                        <a href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            </div>
+            <div class="panel-body">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>IP</th>
+                        <th>版本</th>
+                        <th>端口</th>
+                        <th>别名</th>
+                        <th>状态</th>
+                        <th>连接数</th>
+                        <th>支票</th>
+                        <th>待提现</th>
+                        <th>兑换</th>
+                        <th>区块链浏览器</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="node-list">
+                    {% for node in nodeList %}
+                        <tr>
+                            <td style='vertical-align:middle;'>{{ node.id }}</td>
+                            <td style='vertical-align:middle;'>{{ node.ip }}</td>
+                            <td style='vertical-align:middle;'>{{ node.version }}</td>
+                            <td style='vertical-align:middle;'>{{ node.port }}</td>
+                            <td style='vertical-align:middle;'>{{ node.name }}</td>
+                            <td style='vertical-align:middle;'>{{ node.status }}</td>
+                            <td style='vertical-align:middle;'>{{ node.connect }}</td>
+                            <td style='vertical-align:middle;'>{{ node.chequeSum }}</td>
+                            <td style='vertical-align:middle;'>{{ node.cashout }}</td>
+                            <td style='vertical-align:middle;'>
+                                <button class='btn btn-sm btn-info'>提现</button>
+                            </td>
+                            <td style='vertical-align:middle;'><a
+                                    href='https://blockscout.com/xdai/mainnet/address/{{ node.walletScan }}/transactions'
+                                    target='_blank'>钱包</a><a
+                                    href='https://blockscout.com/xdai/mainnet/address/{{ node.chequeScan }}/transactions'
+                                    style='margin-left: 15px' target='_blank'>支票</a></td>
+                            <td style='vertical-align:middle;'>
+                                <button class="btn btn-sm btn-danger" onclick="deleteNode({{ node.id }})">删除</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+
 </div>
 
 </body>
@@ -89,29 +156,133 @@
 <script type="application/javascript">
 
     function addNode() {
-        $('#btn_file').click();
+
+        var content = $('#node-list-text').val().split("\n");
+        var str = "";
+        if (content.length > 0) {
+
+            for (var i = 0; i < content.length; i++) {
+                str = str + content[i] + ";"
+            }
+
+            $.ajax({
+                url: '/monitor/add_nodes',
+                data: {
+                    nodes: str
+                },
+                method: 'GET',
+                success: function (ret) {
+                    var result = JSON.parse(ret);
+                    if (result.code == 0) {
+                        alert('添加成功！');
+                        refreshPage()
+                    }
+                }
+            })
+        } else {
+            alert('添加失败，请检查数据格式！')
+        }
     }
 
-    $('#btn_file').change(function () {
-        console.log($('#btn_file').val());
-        var filePath = $('#btn_file').val();
+    function deleteNode(id) {
         $.ajax({
-            url: '/monitor/add_nodes',
+            url: '/monitor/delete_node',
             data: {
-                filePath: filePath,
+                id: id
             },
             method: 'GET',
             success: function (ret) {
                 var result = JSON.parse(ret);
-                console.log(result);
-                {#$('#'+id.toString()+'_host').val(result.result.switch.host);#}
-                {#$('#'+id.toString()+'_dbport').val(result.result.switch.port);#}
-                {#$('#'+id.toString()+'_dbuser').val(result.result.switch.dbuser);#}
-                {#$('#'+id.toString()+'_dbpasswd').val(result.result.switch.dbpasswd);#}
-                {#$('#'+id.toString()+'_dbname').val(result.result.switch.dbname);#}
+                if (result.code == 0) {
+                    alert('删除成功！');
+                    refreshPage()
+                }
             }
         })
-    })
+    }
+
+    function refreshNodes() {
+        $.ajax({
+            url: '/monitor/get_node_status',
+            data: {},
+            method: 'GET',
+            success: function () {
+                refreshPage()
+            }
+        })
+    }
+
+    function refreshPage() {
+        $.ajax({
+            url: '/monitor/refresh',
+            data: {},
+            method: 'GET',
+            success: function (ret) {
+                var result = JSON.parse(ret);
+                console.log(result);
+                if (result.code == 0) {
+                    $("#node-sum").text(result.nodeSum);
+                    $("#off-node-sum").text(result.offNodeSum);
+                    $("#cheque-sum").text(result.chequeSum);
+                    $("#uncashed-sum").text(result.uncashedSum);
+                    var list = result.result;
+                    $("#node-list").empty();
+                    for (var i = 0; i < list.length; i++) {
+                        var td = list[i];
+                        var id = td.id;
+                        var ip = td.ip;
+                        var version = td.version;
+                        var port = td.port;
+                        var name = td.name;
+                        var status = td.status;
+                        var connect = parseInt(td.connect);
+                        var chequeSum = parseInt(td.chequeSum);
+                        var cashout = parseInt(td.cashout);
+                        var walletScan = td.walletScan;
+                        var chequeScan = td.chequeScan;
+                        var node_table = "";
+                        if (cashout > 0) {
+                            node_table = "<tr>\n" +
+                                "           <td style='vertical-align:middle;'>" + id + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + ip + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + version + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + port + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + name + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + status + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + connect + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + chequeSum + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + cashout + "</td>\n" +
+                                "           <td style='vertical-align:middle;'><button class='btn btn-sm btn-info'>提现</button></td>\n" +
+                                "           <td style='vertical-align:middle;'><a href='https://blockscout.com/xdai/mainnet/address/" + walletScan + "/transactions' target='_blank'>钱包</a><a href='https://blockscout.com/xdai/mainnet/address/" + chequeScan + "/transactions' style='margin-left: 15px' target='_blank'>支票</a></td>\n" +
+                                "           <td style='vertical-align:middle;'><button class=\"btn btn-sm btn-danger\" onclick=\"deleteNode(" + id + ")\">删除</button></td>\n" +
+                                "           </tr>";
+                            $("#node-list").append(node_table);
+                        } else {
+                            node_table = "<tr>\n" +
+                                "           <td style='vertical-align:middle;'>" + id + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + ip + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + version + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + port + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + name + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + status + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + connect + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + chequeSum + "</td>\n" +
+                                "           <td style='vertical-align:middle;'>" + cashout + "</td>\n" +
+                                "           <td style='vertical-align:middle;'><button class='btn btn-sm btn-info disabled'>提现</button></td>\n" +
+                                "           <td style='vertical-align:middle;'><a href='https://blockscout.com/xdai/mainnet/address/" + walletScan + "/transactions' target='_blank'>钱包</a><a href='https://blockscout.com/xdai/mainnet/address/" + chequeScan + "/transactions' style='margin-left: 15px' target='_blank'>支票</a></td>\n" +
+                                "           <td style='vertical-align:middle;'><button class=\"btn btn-sm btn-danger\" onclick=\"deleteNode(" + id + ")\">删除</button></td>\n" +
+                                "           </tr>";
+                            $("#node-list").append(node_table);
+                        }
+
+                    }
+                }
+            }
+        })
+    }
+
+    {#定时刷新index页面#}
+    {#setInterval(refreshPage(), 10000)#}
 
 </script>
 

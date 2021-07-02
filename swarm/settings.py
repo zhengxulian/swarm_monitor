@@ -82,7 +82,7 @@ if os.name=='nt':
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'swarm',
             'USER': 'root',
-            'PASSWORD': '0527',
+            'PASSWORD': 'xulian',
             'HOST': 'localhost',
             'PORT': '3306',
         }
@@ -94,7 +94,7 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'swarm',
             'USER': 'root',
-            'PASSWORD': '0527',
+            'PASSWORD': 'xulian',
             'HOST': 'localhost',
             'PORT': '3306',
         }

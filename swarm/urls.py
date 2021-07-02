@@ -21,4 +21,7 @@ urlpatterns = {
     path('admin/', admin.site.urls),
     path('monitor/index', swarm.monitor.views.index),
     path('monitor/add_nodes', swarm.monitor.views.add_nodes),
+    path('monitor/refresh', swarm.monitor.views.refresh),
+    path('monitor/get_node_status', swarm.monitor.views.get_node_status),
+    path('monitor/delete_node', swarm.monitor.views.delete_node),
 }
