@@ -142,6 +142,7 @@ def refresh(request):
     ret['result'] = nodeList
     # ret = {'code': 0, 'msg': '', 'result': nodeList}
     res = json.dumps(ret)
+    # print(ret)
     return HttpResponse(res)
 
 def get_node_status(request):
@@ -172,35 +173,56 @@ def get_node_status(request):
             version = json.loads(res.text)['version'].split("-")[0]
             node_status = "在线"
             conn_tmp = requests.get('http://{0}:{1}/peers'.format(item.ip, item.port))
-            conn_num = len(json.loads(conn_tmp.text)['peers'])
-            cheque_tmp = requests.get('http://{0}:{1}/chequebook/cheque'.format(item.ip, item.port))
-            trac_list = []
-            for trac in json.loads(cheque_tmp.text)['lastcheques']:
-                if trac['lastreceived']:
-                    trac_list.append(trac['peer'])
-            chequeSum = len(trac_list)
-            cashout_list = []
-            uncashed = ""
-            for peer in trac_list:
-                res = requests.get('http://{0}:{1}/chequebook/cashout/{2}'.format(item.ip, item.port, peer))
-                if json.loads(res.text)['uncashedAmount']:
-                    cashout_list.append(peer)
-                    uncashed = uncashed + peer + ";"
-            cashout = len(cashout_list)
-            walletScan_tmp = requests.get('http://{0}:{1}/addresses'.format(item.ip, item.port))
-            walletScan = json.loads(walletScan_tmp.text)['ethereum']
-            chequeScan_tmp = requests.get('http://{0}:{1}/chequebook/address'.format(item.ip, item.port))
-            chequeScan = json.loads(chequeScan_tmp.text)['chequebookAddress']
             try:
-                NodeStatus.objects.get(node_id=item.id)
-                NodeStatus.objects.filter(node_id=item.id).update(version=version, status=node_status, connect=conn_num,
-                                                                  chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
-                                                                  chequeScan=chequeScan, uncashed=uncashed)
-            except ObjectDoesNotExist:
-                obj = NodeStatus(version=version, node_id=item, status=node_status, connect=conn_num,
-                                                                  chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
-                                                                  chequeScan=chequeScan, uncashed=uncashed)
-                obj.save()
+                json.loads(conn_tmp.text)['peers']
+            except:
+                conn_num = 0
+                chequeSum = 0
+                cashout = 0
+                walletScan = "#"
+                chequeScan = "#"
+                try:
+                    NodeStatus.objects.get(node_id=item.id)
+                    NodeStatus.objects.filter(node_id=item.id).update(version=version, status=node_status,
+                                                                      connect=conn_num,
+                                                                      chequeSum=chequeSum, cashout=cashout,
+                                                                      walletScan=walletScan,
+                                                                      chequeScan=chequeScan)
+                except ObjectDoesNotExist:
+                    obj = NodeStatus(node_id=item, version=version, status=node_status, connect=conn_num,
+                                     chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
+                                     chequeScan=chequeScan)
+                    obj.save()
+            else:
+                conn_num = len(json.loads(conn_tmp.text)['peers'])
+                cheque_tmp = requests.get('http://{0}:{1}/chequebook/cheque'.format(item.ip, item.port))
+                trac_list = []
+                for trac in json.loads(cheque_tmp.text)['lastcheques']:
+                    if trac['lastreceived']:
+                        trac_list.append(trac['peer'])
+                chequeSum = len(trac_list)
+                cashout_list = []
+                uncashed = ""
+                for peer in trac_list:
+                    res = requests.get('http://{0}:{1}/chequebook/cashout/{2}'.format(item.ip, item.port, peer))
+                    if json.loads(res.text)['uncashedAmount']:
+                        cashout_list.append(peer)
+                        uncashed = uncashed + peer + ";"
+                cashout = len(cashout_list)
+                walletScan_tmp = requests.get('http://{0}:{1}/addresses'.format(item.ip, item.port))
+                walletScan = json.loads(walletScan_tmp.text)['ethereum']
+                chequeScan_tmp = requests.get('http://{0}:{1}/chequebook/address'.format(item.ip, item.port))
+                chequeScan = json.loads(chequeScan_tmp.text)['chequebookAddress']
+                try:
+                    NodeStatus.objects.get(node_id=item.id)
+                    NodeStatus.objects.filter(node_id=item.id).update(version=version, status=node_status, connect=conn_num,
+                                                                      chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
+                                                                      chequeScan=chequeScan, uncashed=uncashed)
+                except ObjectDoesNotExist:
+                    obj = NodeStatus(version=version, node_id=item, status=node_status, connect=conn_num,
+                                                                      chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
+                                                                      chequeScan=chequeScan, uncashed=uncashed)
+                    obj.save()
     return HttpResponse({})
 
 
