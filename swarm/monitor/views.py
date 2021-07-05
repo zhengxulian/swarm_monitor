@@ -142,7 +142,6 @@ def refresh(request):
     ret['result'] = nodeList
     # ret = {'code': 0, 'msg': '', 'result': nodeList}
     res = json.dumps(ret)
-    print(ret)
     return HttpResponse(res)
 
 def get_node_status(request):
@@ -151,7 +150,7 @@ def get_node_status(request):
         # print(type(item))
         try:
            res = requests.get('http://{0}:{1}/health'.format(item.ip, item.port), timeout=1)
-        except exceptions.Timeout:
+        except:
             node_status = "离线"
             version = "Null"
             conn_num = 0
