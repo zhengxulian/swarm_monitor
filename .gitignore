@@ -132,3 +132,4 @@ dmypy.json
 
 # my ignore
 .DS_Store
+*_initial.py
