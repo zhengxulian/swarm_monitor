@@ -145,6 +145,21 @@ def refresh(request):
     # print(ret)
     return HttpResponse(res)
 
+
+def update_data(id, version, status, connect, chequeSum, cashout, walletScan, chequeScan):
+    NodeStatus.objects.get(node_id=id)
+    NodeStatus.objects.filter(node_id=id).update(version=version, status=status, connect=connect,
+                                                      chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
+                                                      chequeScan=chequeScan)
+
+
+def insert_data(id, version, status, connect, chequeSum, cashout, walletScan, chequeScan):
+    obj = NodeStatus(node_id=id, version=version, status=status, connect=connect,
+                     chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
+                     chequeScan=chequeScan)
+    obj.save()
+
+
 def get_node_status(request):
     ret = NodeInfo.objects.all()
     for item in ret:
@@ -160,15 +175,9 @@ def get_node_status(request):
             walletScan = "#"
             chequeScan = "#"
             try:
-                NodeStatus.objects.get(node_id=item.id)
-                NodeStatus.objects.filter(node_id=item.id).update(version=version, status=node_status, connect=conn_num,
-                                                                  chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
-                                                                  chequeScan=chequeScan)
+                update_data(item.id, version, node_status, conn_num, chequeSum, cashout, walletScan, chequeScan)
             except ObjectDoesNotExist:
-                obj = NodeStatus(node_id=item, version=version, status=node_status, connect=conn_num,
-                                                                  chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
-                                                                  chequeScan=chequeScan)
-                obj.save()
+                insert_data(item,  version, node_status, conn_num, chequeSum, cashout, walletScan, chequeScan)
         else:
             version = json.loads(res.text)['version'].split("-")[0]
             node_status = "在线"
@@ -182,17 +191,9 @@ def get_node_status(request):
                 walletScan = "#"
                 chequeScan = "#"
                 try:
-                    NodeStatus.objects.get(node_id=item.id)
-                    NodeStatus.objects.filter(node_id=item.id).update(version=version, status=node_status,
-                                                                      connect=conn_num,
-                                                                      chequeSum=chequeSum, cashout=cashout,
-                                                                      walletScan=walletScan,
-                                                                      chequeScan=chequeScan)
+                    update_data(item.id, version, node_status, conn_num, chequeSum, cashout, walletScan, chequeScan)
                 except ObjectDoesNotExist:
-                    obj = NodeStatus(node_id=item, version=version, status=node_status, connect=conn_num,
-                                     chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
-                                     chequeScan=chequeScan)
-                    obj.save()
+                    insert_data(item, version, node_status, conn_num, chequeSum, cashout, walletScan, chequeScan)
             else:
                 conn_num = len(json.loads(conn_tmp.text)['peers'])
                 cheque_tmp = requests.get('http://{0}:{1}/chequebook/cheque'.format(item.ip, item.port))
@@ -214,15 +215,9 @@ def get_node_status(request):
                 chequeScan_tmp = requests.get('http://{0}:{1}/chequebook/address'.format(item.ip, item.port))
                 chequeScan = json.loads(chequeScan_tmp.text)['chequebookAddress']
                 try:
-                    NodeStatus.objects.get(node_id=item.id)
-                    NodeStatus.objects.filter(node_id=item.id).update(version=version, status=node_status, connect=conn_num,
-                                                                      chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
-                                                                      chequeScan=chequeScan, uncashed=uncashed)
+                    update_data(item.id, version, node_status, conn_num, chequeSum, cashout, walletScan, chequeScan)
                 except ObjectDoesNotExist:
-                    obj = NodeStatus(version=version, node_id=item, status=node_status, connect=conn_num,
-                                                                      chequeSum=chequeSum, cashout=cashout, walletScan=walletScan,
-                                                                      chequeScan=chequeScan, uncashed=uncashed)
-                    obj.save()
+                    insert_data(item,  version, node_status, conn_num, chequeSum, cashout, walletScan, chequeScan)
     return HttpResponse({})
 
 

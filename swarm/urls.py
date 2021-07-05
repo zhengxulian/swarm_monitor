@@ -15,13 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-import swarm.monitor.views
+import swarm.monitor.views as monitor_views
 
 urlpatterns = {
     path('admin/', admin.site.urls),
-    path('monitor/index', swarm.monitor.views.index),
-    path('monitor/add_nodes', swarm.monitor.views.add_nodes),
-    path('monitor/refresh', swarm.monitor.views.refresh),
-    path('monitor/get_node_status', swarm.monitor.views.get_node_status),
-    path('monitor/delete_node', swarm.monitor.views.delete_node),
+    path('monitor/index', monitor_views.index),
+    path('monitor/add_nodes', monitor_views.add_nodes),
+    path('monitor/refresh', monitor_views.refresh),
+    path('monitor/get_node_status', monitor_views.get_node_status),
+    path('monitor/delete_node', monitor_views.delete_node),
 }
